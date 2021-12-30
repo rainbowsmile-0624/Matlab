@@ -1,16 +1,15 @@
-function data_out=convertToOriCode(data,bits)
-%data: A hexadecimal number
-%bits: The biggest bits wide
+function data=convertToOriCode(data,bits)
 
+        if data<0
+            error('parameter ''bits'' is not correct');
+        end
+        
+        if data>(2^bits-1)
+            error('parameter ''bits'' is not correct');
+        end
+    
+        if data>=2^(bits-1)
+            data=data-2^bits;
+        end
 
-if(length(data)>(bits/4))
-    error('length(data)>(bits/4)');
-end
-
-data=hex2dec(data);
-
-if(data>=2^(bits-1))
-    data_out=data-2^bits;
-else 
-    data_out=data;
 end

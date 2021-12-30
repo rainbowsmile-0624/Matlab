@@ -18,6 +18,6 @@ my_string=strrep(my_string,' ','');
 my_data1=zeros(1,length(my_string)/2);
 my_data2=zeros(1,length(my_string)/2);
 for i=1:length(my_string)/2
-    my_data1(i)=convertToOriCode(my_string(i*2-1),24);
-    my_data2(i)=convertToOriCode(my_string(i*2),24);
+    my_data1(i)=convertToOriCode(hex2dec(my_string(i*2-1)),24);
+    my_data2(i)=convertToOriCode(hex2dec(my_string(i*2)),24);
 end
