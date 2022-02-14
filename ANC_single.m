@@ -86,9 +86,6 @@ end
 hold off;
 title('OFZ_Sh_Sz');
 
-rms(abs(OFZ_en(512:612)))/rms(abs(OFZ_en(3000:3500)))
-
-
 
 %{ 
         Here is the ANC process
@@ -109,7 +106,7 @@ ANC_wz      = zeros(ANC_DEPTH-1,FILTER_LENGTH);
 ANC_yn_s    = zeros(ANC_DEPTH-1,1);
 ANC_en      = zeros(ANC_DEPTH,1);
 ANC_sn      = zeros(ANC_DEPTH,1);
-ANC_mu      = 2^(-5);
+ANC_mu      = 2^(-12);
 
 for k=1:ANC_DEPTH-1
 
