@@ -1,7 +1,7 @@
 clc;
 clear;
 TIME_LENTH=1000;
-
+format short
 
 my_table1=readtable('D:\06, Matlab\TXT\I2S_16.txt');
 my_table2=readtable('D:\06, Matlab\TXT\I2S_24_1.txt');
@@ -18,7 +18,7 @@ figure(1);
 subplot(4,1,1)
 hold on;
 plot(1:length(my_data1),my_data1)
-plot(1:length(my_data5),my_data5)
+plot(1:length(my_data3),my_data3)
 hold off;
 axis([512,length(my_data1),-32768,32767])
 figure(1);
@@ -36,9 +36,10 @@ subplot(4,1,4)
 plot(1:length(my_data5),my_data5)
 axis([1,length(my_data5),-32768,32767])
 title('Right channel')
-
-
-rms(my_data5(1:2000))/rms(my_data5(8000:10000))
-
-
+figure(2)
+MyFFT(my_data3,24414)
+figure(3)
+MyFFT(my_data5,24414)
+X = sprintf('拟合分贝为%ddB',round(10*log10(max(my_data5)/rms(my_data5(3000:3500)))));
+disp(X)
 
