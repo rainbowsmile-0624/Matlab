@@ -12,20 +12,21 @@ format default;
 %{
     常数变量初始化
 %}
-OFZ_DEPTH = 2^12;
-ANC_DEPTH = 2^12;
-FILTER_LENGTH =126;
+OFZ_DEPTH = 2^12;    %拟合点数
+ANC_DEPTH = 2^12;    %降噪点数
+FILTER_LENGTH =126;  %滤波器长度
 
 %{
     数列初始化
 %}
 Pw = fir1(FILTER_LENGTH-1,0.3);
 %生成单脉冲权系数数组
-Sw = fir1(FILTER_LENGTH-1,0.45);
+Sw = fir1(FILTER_LENGTH-1,0.3);
 Sw = [zeros(1,FILTER_LENGTH/2) Sw(FILTER_LENGTH/2+1:FILTER_LENGTH)];
 Sw = -circshift(Sw,-30);
+%生成白噪声和模拟信号
 OFZ_vn = 2^(16)*(rand(1,OFZ_DEPTH)-0.5);
-OFZ_dn = 0.9*filter(Sw,1,OFZ_vn)... %滤波
+OFZ_dn = 0.9*filter(Sw,1,OFZ_vn)... %相关性成分
         +0.05*2^(16)*(rand(1,OFZ_DEPTH)-0.5)... %白噪声
         +0.05*(2^16-1)*createSin(300,51200,OFZ_DEPTH,0.5); %低频正弦波
 
@@ -107,12 +108,12 @@ title('OFZ_Sh_Sz');
 %{
         Here is the ANC process
 %}
-% ANC_xn = bitsRound((2^16-1)*(rand(1,ANC_DEPTH)-0.5),16);
+ANC_xn = bitsRound((2^16-1)*(rand(1,ANC_DEPTH)-0.5),16);
 fsin = 0.35*(2^16-1)*createSin(800,51200,ANC_DEPTH,0.5)+... 
     0.05*(2^16-1)*(rand(1,ANC_DEPTH)-0.5)+...
     0.3*(2^16-1)*createSin(300,51200,ANC_DEPTH,0.5)+...
     0.3*(2^16-1)*createSin(500,51200,ANC_DEPTH,0.5);
-% fsin = 0.5*createSin(20000/ANC_DEPTH*30,50000,ANC_DEPTH,0.5);
+% fsin = (2^16-1)* 0.5*createSin(20000/ANC_DEPTH*30,50000,ANC_DEPTH,0.5);
 ANC_xn = bitsRound(fsin,16);
 ANC_pn = bitsRound(filter(Pw,1,ANC_xn),16);
 
@@ -134,10 +135,8 @@ for k=1:ANC_DEPTH-1
     
     ANC_Sh_yn = [ANC_yn(k) ANC_Sh_yn(1:FILTER_LENGTH-1)];
     
-    ANC_yn_s(k)  = dot(ANC_Sh_yn,Sw);
+    ANC_yn_s(k)  = dot(ANC_Sh_yn,Sw/2^(20));
     ANC_yn_s(k) = bitsRound(ANC_yn_s(k),40);
-    
-    
     
     ANC_en(k) = ANC_pn(k) - ANC_yn_s(k);
     ANC_en(k) = ANC_en(k)*0.5; %模拟低频音衰减
@@ -149,7 +148,7 @@ for k=1:ANC_DEPTH-1
     ANC_Sh_sn = [ANC_sn(k) ANC_Sh_sn(1:FILTER_LENGTH-1)];
     
     ANC_wz(k+1,:) = ANC_wz(k,:) + ANC_mu*ANC_en(k)*ANC_Sh_sn*2^(-32);
-    ANC_wz(k+1,:) = bitsRound(2^28*ANC_wz(k+1,:),28)/2^28;
+%     ANC_wz(k+1,:) = bitsRound(2^28*ANC_wz(k+1,:),28)/2^28;
     
     %     if(k==10)
     %         hexDisplay(ANC_yn(k)*2^40,40);
