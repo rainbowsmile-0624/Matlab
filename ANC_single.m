@@ -12,9 +12,9 @@ format default;
 %{
     常数变量初始化
 %}
-OFZ_DEPTH = 2^12;    %拟合点数
-ANC_DEPTH = 2^12;    %降噪点数
-FILTER_LENGTH =126;  %滤波器长度
+OFZ_DEPTH = 2^12;         %拟合点数
+ANC_DEPTH = OFZ_DEPTH;    %降噪点数
+FILTER_LENGTH =126;       %滤波器长度
 
 %{
     数列初始化
@@ -148,7 +148,8 @@ for k=1:ANC_DEPTH-1
     ANC_Sh_sn = [ANC_sn(k) ANC_Sh_sn(1:FILTER_LENGTH-1)];
     
     ANC_wz(k+1,:) = ANC_wz(k,:) + ANC_mu*ANC_en(k)*ANC_Sh_sn*2^(-32);
-%     ANC_wz(k+1,:) = bitsRound(2^28*ANC_wz(k+1,:),28)/2^28;
+    %wz是28位
+    ANC_wz(k+1,:) = bitsRound(2^28*ANC_wz(k+1,:),28)/2^28;
     
     %     if(k==10)
     %         hexDisplay(ANC_yn(k)*2^40,40);
@@ -182,9 +183,8 @@ X = sprintf('降噪分贝为%ddB',(10*log10(rms(ANC_pn(1:ANC_DEPTH))/rms(ANC_en(
 disp(X);
 X = sprintf('拟合分贝为%ddB',(10*log10(max(OFZ_en)/rms(OFZ_en(3000:3500)))));
 disp(X);
-
 % %-----------------------Write mif file-------------------------%
-writeMifFile('D:\06, Matlab\MIF/sz_rom.mif',bitsRound(2^20*Sw,20),20,FILTER_LENGTH);
+writeMifFile('D:\06, Matlab\MIF/sz_ram.mif',bitsRound(Sw,20),20,FILTER_LENGTH);
 writeMifFile('D:\06, Matlab\MIF/vn_rom.mif',bitsRound(OFZ_vn,16),16,OFZ_DEPTH);
 writeMifFile('D:\06, Matlab\MIF/dn_rom.mif',bitsRound(OFZ_dn,16),16,OFZ_DEPTH) ;
 writeMifFile('D:\06, Matlab\MIF/xn_rom.mif',bitsRound(ANC_xn,16),16,ANC_DEPTH) ;

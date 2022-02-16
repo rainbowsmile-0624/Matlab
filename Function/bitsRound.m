@@ -1,4 +1,5 @@
-function data=bitsRound(data,bits)
+function data=bitsRound(data,bits,isMulti)
+
     for i = 1:length(data)
         %be sure input is integer
         data(i) = floor(data(i));
@@ -20,4 +21,5 @@ function data=bitsRound(data,bits)
             data(i)=data(i)-2^bits;
         end
     end
+
 end
